@@ -1,0 +1,16 @@
+.liked {
+  width: 250px;
+}
+
+.notLiked {
+  width: 150px;
+}
+
+.filterContainer {
+  display: flex;
+}
+
+.characterContainer {
+  display: flex;
+  background-color: cadetblue;
+}
