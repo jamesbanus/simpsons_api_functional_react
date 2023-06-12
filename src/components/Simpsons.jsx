@@ -9,6 +9,9 @@ const Simpsons = (props) => {
     onSearchInput,
     onSortInput,
     onReset,
+    search,
+    errors,
+    sort,
   } = props;
 
   return (
@@ -17,8 +20,10 @@ const Simpsons = (props) => {
         onSearchInput={onSearchInput}
         onSortInput={onSortInput}
         onReset={onReset}
+        search={search}
+        sort={sort}
       />
-
+      <p>{errors && errors.search}</p>
       {simpsons.map((item) => {
         return (
           <Character

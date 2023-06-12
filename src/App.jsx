@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Loading from "./components/Loading";
 import Simpsons from "./components/Simpsons";
 import "./App.css";
+import { validate } from "./validation";
 
 const App = () => {
-  const [simpsons, setSimpsons] = useState();
+  const [simpsons, setSimpsons] = useState([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
+  const [errors, setErrors] = useState({});
 
-  const getData = async () => {
+  const getData = useCallback(async () => {
+    console.log(errors, Date.now());
+    if (errors || !search) return;
+    console.log("get data ran", Date.now());
     try {
       const { data } = await axios.get(
-        `https://thesimpsonsquoteapi.glitch.me/quotes?count=50`
+        `https://thesimpsonsquoteapi.glitch.me/quotes?count=50&character=${search}`
       );
 
       data.forEach((element, index) => {
@@ -21,13 +26,15 @@ const App = () => {
 
       setSimpsons(data);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
-  };
+  }, [search, errors, sort]);
+
+  // console.log(simpsons, search);
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [getData]);
 
   const onLikeToggle = (id) => {
     const list = [...simpsons];
@@ -49,8 +56,12 @@ const App = () => {
     setSimpsons(list);
   };
 
-  const onSearchInput = (e) => {
+  const onSearchInput = async (e) => {
     setSearch(e.target.value);
+
+    // validate
+    const res = await validate(e.target.value);
+    setErrors(res);
   };
 
   const onSortInput = (e) => {
@@ -60,8 +71,6 @@ const App = () => {
   const onReset = () => {
     setSort("");
     setSearch("");
-    document.getElementById("characterSearch").value = "";
-    document.getElementById("characterSort").value = "";
   };
 
   // Below is the return once data has loaded
@@ -79,12 +88,6 @@ const App = () => {
   //filter result
 
   let filteredList = [...simpsons];
-
-  if (search) {
-    filteredList = filteredList.filter((item) => {
-      return item.character.toLowerCase().includes(search.toLowerCase());
-    });
-  }
 
   // sort by alphabetical
   if (sort == "Asc") {
@@ -111,6 +114,9 @@ const App = () => {
         onSearchInput={onSearchInput}
         onSortInput={onSortInput}
         onReset={onReset}
+        search={search}
+        sort={sort}
+        errors={errors}
       />
     </>
   );
